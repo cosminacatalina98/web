@@ -1,0 +1,47 @@
+### **Exercise 2: Web Scraping a Product Listings Page**
+
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+URL = "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
+
+# 1. Fetch the webpage content
+response = requests.get(URL)
+soup = BeautifulSoup(response.text, "html.parser")
+
+# 2. Find all product cards
+products = soup.find_all("div", class_="thumbnail")
+
+# 3. Extract product data
+data = []
+
+for product in products:
+    name = product.find("a", class_="title").text.strip()
+
+    price_text = product.find("h4", class_="price").text.strip()
+    price = float(price_text.replace("$", ""))
+
+    description = product.find("p", class_="description").text.strip()
+
+    reviews_text = product.find("p", class_="review-count").text.strip()
+    reviews = int(reviews_text.split()[0])
+
+    data.append({
+        "name": name,
+        "price": price,
+        "description": description,
+        "reviews": reviews
+    })
+
+# 4. Store data in a DataFrame
+df = pd.DataFrame(data)
+
+# 5. Clean the DataFrame
+df_cleaned = df.drop_duplicates()
+df_cleaned = df_cleaned.dropna()
+
+# 6. Save to CSV
+df_cleaned.to_csv("scraped_products.csv", index=False)
+
+print(df_cleaned.head())

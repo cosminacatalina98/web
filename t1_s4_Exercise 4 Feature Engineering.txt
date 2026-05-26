@@ -1,0 +1,48 @@
+### **Exercise 4: Feature Engineering for Classification**
+
+import pandas as pd
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
+
+# Step 1: Load the Titanic dataset
+df = sns.load_dataset("titanic")
+
+# Step 2: Select useful columns for classification
+df = df[["survived", "pclass", "sex", "age", "sibsp", "parch", "fare", "embarked"]]
+
+# Step 3: Handle missing values
+df["age"] = df["age"].fillna(df["age"].median())
+df["embarked"] = df["embarked"].fillna(df["embarked"].mode()[0])
+df["fare"] = df["fare"].fillna(df["fare"].median())
+
+# Step 4: Create new features
+df["family_size"] = df["sibsp"] + df["parch"] + 1
+df["is_alone"] = (df["family_size"] == 1).astype(int)
+
+# Step 5: Encode categorical columns
+df["sex"] = df["sex"].map({
+    "male": 0,
+    "female": 1
+})
+
+df = pd.get_dummies(df, columns=["embarked"], drop_first=True)
+
+# Step 6: Scale numerical features
+scaler = MinMaxScaler()
+
+columns_to_scale = ["age", "fare", "family_size"]
+
+df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
+
+# Step 7: Separate features and target
+X = df.drop("survived", axis=1)
+y = df["survived"]
+
+print("Cleaned DataFrame:")
+print(df.head())
+
+print("\nFeatures:")
+print(X.head())
+
+print("\nTarget:")
+print(y.head())

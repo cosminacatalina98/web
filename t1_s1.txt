@@ -1,0 +1,47 @@
+
+
+import requests
+import pandas as pd
+from pprint import pprint
+
+cities = ["New York", "London", "Tokyo", "Paris", "Berlin"]
+
+search_url = "https://geocoding-api.open-meteo.com/v1/search?name={city}"
+weather_url = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+
+weather_data = []
+
+for city in cities:
+    response = requests.get(search_url.format(city=city))
+    data = response.json()
+
+    if "results" not in data:
+        print(f"No result found for {city}")
+        continue
+
+    main_result = data["results"][0]
+
+    lat = main_result["latitude"]
+    lon = main_result["longitude"]
+    country = main_result.get("country", "Unknown")
+
+    weather_response = requests.get(weather_url.format(lat=lat, lon=lon))
+    weather_json = weather_response.json()
+
+    current_weather = weather_json["current_weather"]
+
+    weather_data.append({
+        "city": city,
+        "country": country,
+        "latitude": float(lat),
+        "longitude": float(lon),
+        "temperature": float(current_weather["temperature"]),
+        "windspeed": float(current_weather["windspeed"]),
+        "winddirection": float(current_weather["winddirection"]),
+        "weathercode": int(current_weather["weathercode"]),
+        "time": current_weather["time"]
+    })
+
+df = pd.DataFrame(weather_data)
+
+print(df)

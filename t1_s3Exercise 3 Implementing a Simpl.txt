@@ -1,0 +1,67 @@
+### **Exercise 3: Implementing a Simple Recommendation System**
+
+import pandas as pd
+
+url = "https://files.grouplens.org/datasets/movielens/ml-100k/u.data"
+column_names = ["user_id", "movie_id", "rating", "timestamp"]
+ratings = pd.read_csv(
+    url,
+    sep="\t",
+    names=column_names,
+    usecols=["user_id", "movie_id", "rating"]
+)
+
+url_movies = "https://files.grouplens.org/datasets/movielens/ml-100k/u.item"
+movies = pd.read_csv(
+    url_movies,
+    sep="|",
+    encoding="latin-1",
+    names=["movie_id", "title"],
+    usecols=[0, 1]
+)
+
+# 1. Merge ratings with movie titles
+df = pd.merge(ratings, movies, on="movie_id")
+
+# 2. Create a user-movie matrix
+user_movie_matrix = df.pivot_table(
+    index="user_id",
+    columns="title",
+    values="rating"
+)
+
+# 3. Choose a movie for recommendations
+selected_movie = "Star Wars (1977)"
+
+# 4. Get ratings for the selected movie
+selected_movie_ratings = user_movie_matrix[selected_movie]
+
+# 5. Compute similarity with all other movies
+similar_movies = user_movie_matrix.corrwith(selected_movie_ratings)
+
+# 6. Create a DataFrame with similarity scores
+recommendations = pd.DataFrame({
+    "correlation": similar_movies
+})
+
+recommendations = recommendations.dropna()
+
+# 7. Add number of ratings and average rating for each movie
+movie_stats = df.groupby("title")["rating"].agg(["count", "mean"])
+
+recommendations = recommendations.join(movie_stats)
+
+# 8. Keep only movies with enough ratings
+recommendations = recommendations[recommendations["count"] >= 50]
+
+# 9. Remove the selected movie itself
+recommendations = recommendations.drop(selected_movie, errors="ignore")
+
+# 10. Sort by similarity
+recommendations = recommendations.sort_values(
+    by="correlation",
+    ascending=False
+)
+
+print("Recommended movies based on:", selected_movie)
+print(recommendations.head(10))
