@@ -1,0 +1,57 @@
+pip install pandas requests beautifulsoup4 scikit-learn torch matplotlib
+
+
+1. Creează un proiect nou
+
+Deschide PyCharm → New Project → alege un folder → lasă bifat să creeze un Virtual Environment → Create.
+
+2. Creează un fișier Python
+
+Click dreapta pe proiect → New → Python File.
+
+De exemplu:
+
+exercitiul1.py
+3. Instalează librăriile necesare
+
+În PyCharm, deschide terminalul de jos: Terminal.
+
+Rulează:
+
+pip install pandas requests beautifulsoup4 scikit-learn torch matplotlib
+
+Dacă ai mai multe versiuni de Python și pip nu merge, încearcă:
+
+python -m pip install pandas requests beautifulsoup4 scikit-learn torch matplotlib
+4. Pune codul în fișier
+
+De exemplu, în exercitiul1.py pui codul complet.
+
+5. Rulează codul
+
+Click dreapta în fișier → Run 'exercitiul1'.
+
+Sau apeși triunghiul verde din dreapta sus.
+
+6. Pentru fiecare exercițiu
+
+Poți crea fișiere separate:
+
+exercitiul1.py
+exercitiul2.py
+exercitiul3.py
+exercitiul4.py
+
+Apoi le rulezi individual.
+
+Pentru PyTorch, dacă instalarea simplă nu merge, rulează:
+
+python -m pip install torch
+
+După instalare, poți testa rapid în PyCharm cu:
+
+import torch
+
+print(torch.__version__)
+
+Dacă îți afișează o versiune, e instalat corect.
