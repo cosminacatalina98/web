@@ -1,0 +1,36 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+url = "http://books.toscrape.com/"
+
+response = requests.get(url)
+
+# === START ===
+
+soup = BeautifulSoup(response.text, "html.parser")
+
+books = soup.find_all("article", class_="product_pod")
+
+data = []
+
+for book in books:
+    title = book.find("h3").find("a")["title"]
+
+    price_text = book.find("p", class_="price_color").text.strip()
+    price = float(price_text.replace("£", ""))
+
+    availability_text = book.find("p", class_="instock availability").text.strip()
+    availability = 1 if "In stock" in availability_text else 0
+
+    data.append({
+        "title": title,
+        "price": price,
+        "availability": availability
+    })
+
+df = pd.DataFrame(data)
+
+# === END ===
+
+print(df)

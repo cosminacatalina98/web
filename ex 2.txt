@@ -1,0 +1,57 @@
+ex 2
+
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import pandas as pd
+
+# === START ===
+
+categories = ['sci.space', 'rec.sport.hockey']
+
+data = fetch_20newsgroups(
+    subset='all',
+    categories=categories,
+    shuffle=True,
+    random_state=42
+)
+
+df = pd.DataFrame({
+    "text": data.data,
+    "label": data.target
+})
+
+X_train_text, X_test_text, y_train, y_test = train_test_split(
+    df["text"],
+    df["label"],
+    test_size=0.3,
+    random_state=42
+)
+
+vectorizer = CountVectorizer(stop_words="english")
+
+X_train = vectorizer.fit_transform(X_train_text)
+X_test = vectorizer.transform(X_test_text)
+
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"Test Accuracy: {accuracy:.2f}")
+
+comparison = pd.DataFrame({
+    "Text": X_test_text.values,
+    "Actual Label": y_test.values,
+    "Predicted Label": y_pred
+})
+
+print("\nPredictions vs. Actual:")
+print(comparison.head())
+
+# === END ===
